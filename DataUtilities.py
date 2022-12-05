@@ -53,3 +53,34 @@ class FitsReader:
          
 
 
+class ImageProcessor:
+    # def __init__(self, data):
+    #     self.data = data
+
+    @staticmethod
+    def convolve(data, kernel):
+        if (type(kernel).__module__ == np.__name__ and kernel.ndim == 2 and kernel.shape[0] == kernel.shape[1]):
+            kernel_size = kernel.shape[0]
+            if (kernel_size % 2 == 1):
+                image_height, image_width = data.shape
+                output_height = image_height - kernel_size + 1
+                output_width = image_width - kernel_size + 1
+
+                output = np.zeros((output_height, output_width))
+
+                image_margin = (kernel_size - 1) // 2
+
+                for i in range(image_margin, image_height - image_margin):
+                    for j in range(image_margin, image_width - image_margin):
+                        image_segment = data[
+                            i - image_margin : i + image_margin + 1,
+                            j - image_margin : j + image_margin + 1
+                        ]
+                        multiplied = np.multiply(image_segment, kernel)
+                        cell_value = np.sum(multiplied)
+                        output[i - image_margin, j - image_margin] = cell_value
+            else:
+                print("Error: kernel must be a square[odd x odd] numpy array")
+        else:
+            print("Error: kernel must be a square[odd x odd] numpy array")
+        return output
